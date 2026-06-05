@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyMarkDown</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79b8ff;
+      --drop-bg: #161b22;
+      --drop-border: #30363d;
+      --drop-active-border: #58a6ff;
+      --drop-active-bg: #1c2a3a;
+    }
+
+    body {
+      width: 340px;
+      min-height: 260px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0d1117;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    main {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #drop-zone {
+      border: 2px dashed var(--drop-border);
+      border-radius: 10px;
+      background: var(--drop-bg);
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #drop-zone.drag-over {
+      border-color: var(--drop-active-border);
+      background: var(--drop-active-bg);
+    }
+
+    #drop-zone .drop-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    #drop-zone .drop-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    #drop-zone .drop-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    #drop-zone .browse-link {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 11px;
+    }
+
+    #drop-zone .browse-link:hover { color: var(--accent-hover); }
+
+    #file-input { display: none; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      border-top: 1px solid var(--border);
+    }
+
+    #paste-area {
+      width: 100%;
+      height: 90px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+
+    #paste-area::placeholder { color: var(--text-muted); font-family: inherit; }
+    #paste-area:focus { border-color: var(--accent); }
+
+    #render-btn {
+      width: 100%;
+      padding: 9px;
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    #render-btn:hover { background: var(--accent-hover); }
+    #render-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #status {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      min-height: 16px;
+    }
+
+    #status.error { color: #f85149; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-icon">M↓</div>
+    <div>
+      <h1>EasyMarkDown</h1>
+      <span>Markdown viewer</span>
+    </div>
+  </header>
+
+  <main>
+    <div id="drop-zone">
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Drop a Markdown file here</div>
+      <div class="drop-sub">.md, .markdown, .mdown, .mkd</div>
+      <span class="browse-link" id="browse-link">or click to browse</span>
+    </div>
+    <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,text/markdown,text/plain" />
+
+    <div class="divider">or paste markdown</div>
+
+    <textarea
+      id="paste-area"
+      placeholder="# Hello World&#10;Paste your markdown here..."
+      spellcheck="false"
+    ></textarea>
+
+    <button id="render-btn">Render</button>
+    <div id="status"></div>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

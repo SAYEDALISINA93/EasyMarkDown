@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyMarkDown Viewer</title>
+  <link rel="stylesheet" href="styles/viewer.css" />
+</head>
+<body>
+  <div id="emd-toolbar">
+    <span id="emd-logo">&#9634; EasyMarkDown</span>
+    <span id="emd-filename">—</span>
+    <button id="emd-raw-btn" title="Toggle raw source">Raw</button>
+    <button id="emd-copy-btn" title="Copy raw markdown">Copy</button>
+    <button id="emd-print-btn" title="Print">Print</button>
+  </div>
+  <div id="emd-container">
+    <article id="emd-content" class="markdown-body"></article>
+  </div>
+  <div id="emd-raw-view">
+    <pre id="emd-raw-pre"></pre>
+  </div>
+
+  <script src="lib/marked.min.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>
